@@ -1,7 +1,7 @@
 from PIL import Image
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+from torchvision import models
 import torch.optim as optim
 import torchvision.transforms as transforms
 import copy
@@ -15,7 +15,11 @@ class StyleModel:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.content_path = content_path
         self.style_path = style_path
-        self.model = torch.load(model_path, map_location=torch.device(self.device))
+        try:
+            self.model = torch.load(model_path, map_location=torch.device(self.device))
+        except Exception as err:
+            self.model = models.vgg19(pretrained=True).features.to(self.device).eval()
+            torch.save(self.model, model_path)
         self.normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(self.device)
         self.normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self.device)
         self.content_layers_default = ['conv_4']
