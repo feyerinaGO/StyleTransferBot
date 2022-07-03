@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from aiogram import executor
 from aiogram.utils.executor import start_webhook
 from data.config import WEBHOOK_URL, WEBHOOK_PATH, WEBAPP_HOST, WEBAPP_PORT
 from handlers import dp
