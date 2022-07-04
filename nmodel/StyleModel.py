@@ -20,32 +20,26 @@ class StyleModel:
         except Exception as err:
             self.model = models.vgg19(pretrained=True).features.to(self.device).eval()
             torch.save(self.model, model_path)
+        self.img_size = 128
+        self.loader = transforms.Compose([
+            transforms.Resize(self.img_size),
+            transforms.CenterCrop(self.img_size),
+            transforms.ToTensor()])
         self.normalization_mean = torch.tensor([0.485, 0.456, 0.406]).to(self.device)
         self.normalization_std = torch.tensor([0.229, 0.224, 0.225]).to(self.device)
         self.content_layers_default = ['conv_4']
         self.style_layers_default = ['conv_1', 'conv_2', 'conv_3', 'conv_4', 'conv_5']
-        self.cnt_loader = transforms.Compose([transforms.ToTensor()])
+        #self.cnt_loader = transforms.Compose([transforms.ToTensor()])
         self.unloader = transforms.ToPILImage()
 
-    async def content_loader(self, image_name):
-        image = Image.open(image_name)
-        image = self.cnt_loader(image).unsqueeze(0)
-        return image.to(self.device, torch.float)
-
-    async def style_loader(self, image_name):
+    async def img_loader(self, image_name):
         image = Image.open(image_name)
         image = self.loader(image).unsqueeze(0)
         return image.to(self.device, torch.float)
 
     async def load_images(self):
-        self.content_img = await self.content_loader(self.content_path)
-        self.img_size_x = self.content_img.size()[2]
-        self.img_size_y = self.content_img.size()[3]
-        self.loader = transforms.Compose([
-            transforms.Resize([self.img_size_x, self.img_size_y]),
-            transforms.CenterCrop([self.img_size_x, self.img_size_y]),
-            transforms.ToTensor()])
-        self.style_img = await self.style_loader(self.style_path)
+        self.content_img = await self.img_loader(self.content_path)
+        self.style_img = await self.img_loader(self.style_path)
         self.input_img = self.content_img.clone()
 
     async def get_style_model_and_losses(self):
