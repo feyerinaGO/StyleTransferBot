@@ -16,4 +16,4 @@
 
 Запуск бота - файл app.py
 
-Основыне команды бота - файл handlers>users>start.py
+Основные команды бота - файл handlers>users>start.py
