@@ -1,15 +1,13 @@
 import asyncio
 import logging
+from aiogram import executor
 from aiogram.utils.executor import start_webhook
 from data.config import WEBHOOK_URL, WEBHOOK_PATH, WEBAPP_HOST, WEBAPP_PORT
 from handlers import dp
 from loader import  bot
 
 
-
-async def on_startup(dispatcher):
-    await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
-
+async def on_startapp(dispatcher):
     from utils.notify_admins import on_startup_notify
     await on_startup_notify(dispatcher)
 
@@ -17,6 +15,10 @@ async def on_startup(dispatcher):
     await set_default_commands(dispatcher)
 
     print('Bot works!')
+
+async def on_startup(dispatcher):
+    await bot.set_webhook(WEBHOOK_URL, drop_pending_updates=True)
+    await on_startapp(dispatcher)
 
 
 async def on_shutdown(dispatcher):
